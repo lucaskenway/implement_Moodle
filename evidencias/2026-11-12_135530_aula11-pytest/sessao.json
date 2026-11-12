@@ -1,0 +1,73 @@
+{
+  "versao_formato": 1,
+  "descricao": "aula11-pytest",
+  "projeto": "implement_Moodle",
+  "raiz_projeto": "C:/Users/lucas/implement_Moodle",
+  "inicio": "2026-11-12T13:55:30-03:00",
+  "fim": "2026-11-12T13:55:34-03:00",
+  "ambiente_inicio": {
+    "so": "WSL (Ubuntu) Ubuntu 26.04 LTS",
+    "usuario": "lucaskenway",
+    "host": "DESKTOP-AMJ5UEC",
+    "python": "3.14.4",
+    "terminal": ""
+  },
+  "itens": [
+    {
+      "numero": 1,
+      "tipo": "registro",
+      "descricao": "pytest do template (copia no FS Linux)",
+      "comando": "cd /home/lucaskenway/.claude-tmp/claude-1000/-mnt-c-Users-lucas-devops-20262/ca12936d-720f-4fb3-b2f8-18fc2d2414b0/scratchpad/moodle-copy && git pull -q && uv run --no-project --with pytest --with hypothesis --with pyyaml python -m pytest -q -p no:cacheprovider",
+      "shell": "bash",
+      "estilo": "terminal",
+      "cwd": "/mnt/c/Users/lucas/implement_Moodle",
+      "inicio": "2026-11-12T13:55:31-03:00",
+      "fim": "2026-11-12T13:55:32-03:00",
+      "duracao_s": 1.7779690799998207,
+      "retorno": 0,
+      "interrompido": false,
+      "redacoes": {},
+      "avisos": [],
+      "arquivos": [
+        {
+          "nome": "001_135531_pytest-do-template-copia-no-fs-linux.txt",
+          "tipo": "txt",
+          "sha256": "d261dbaf5b1e8a9f3ea2e43407b4ed07163195e9a6fa4739e4622aaaa058d929"
+        },
+        {
+          "nome": "001_135531_pytest-do-template-copia-no-fs-linux_renderizada.png",
+          "tipo": "png-renderizada",
+          "sha256": "1a7281a19575fbf4c12d4f14708253cac799b62881cf529930ba09a44a1512c6"
+        }
+      ]
+    },
+    {
+      "numero": 2,
+      "tipo": "registro",
+      "descricao": "titulo da pagina servida",
+      "comando": "curl -sL http://localhost:8080/ | grep -o '<title>[^<]*'",
+      "shell": "bash",
+      "estilo": "terminal",
+      "cwd": "/mnt/c/Users/lucas/implement_Moodle",
+      "inicio": "2026-11-12T13:55:33-03:00",
+      "fim": "2026-11-12T13:55:34-03:00",
+      "duracao_s": 0.5887857090001489,
+      "retorno": 0,
+      "interrompido": false,
+      "redacoes": {},
+      "avisos": [],
+      "arquivos": [
+        {
+          "nome": "002_135533_titulo-da-pagina-servida.txt",
+          "tipo": "txt",
+          "sha256": "260738f2172cdb0a43a984bab24f8a04b2c4b4305dae3ef4104a8cf10a5bf8d3"
+        },
+        {
+          "nome": "002_135533_titulo-da-pagina-servida_renderizada.png",
+          "tipo": "png-renderizada",
+          "sha256": "3b652dbf9436e6fd91fca22ce84bee685c0cc65d9573f6e489ff1b1b175d0e53"
+        }
+      ]
+    }
+  ]
+}

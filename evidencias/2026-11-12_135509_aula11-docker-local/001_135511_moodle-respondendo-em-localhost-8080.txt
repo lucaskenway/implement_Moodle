@@ -1,0 +1,16 @@
+===== EVIDÊNCIA #001 — Moodle respondendo em localhost:8080 =====
+Comando:            curl -s -o /dev/null -w 'HTTP %{http_code} -> %{redirect_url}\n' http://localhost:8080/
+Shell:              direto
+Diretório:          /mnt/c/Users/lucas/implement_Moodle
+Ambiente:           WSL (Ubuntu) Ubuntu 26.04 LTS | usuário lucaskenway | host DESKTOP-AMJ5UEC
+Início:             2026-11-12T13:55:11.257-03:00
+Fim:                2026-11-12T13:55:11.661-03:00
+Duração:            0.405 s
+Código de retorno:  0 (sucesso)
+Dados sensíveis:    nenhum detectado
+Origem:             saída capturada diretamente do processo pela ferramenta evidencia 0.1.0
+
+----- SAÍDA (stdout e stderr intercalados, na ordem em que chegaram) -----
+HTTP 302 -> http://localhost:8080/install.php
+
+----- FIM -----

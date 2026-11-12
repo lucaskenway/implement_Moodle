@@ -1,0 +1,101 @@
+{
+  "versao_formato": 1,
+  "descricao": "aula11-docker-local",
+  "projeto": "implement_Moodle",
+  "raiz_projeto": "C:/Users/lucas/implement_Moodle",
+  "inicio": "2026-11-12T13:55:09-03:00",
+  "fim": "2026-11-12T13:55:19-03:00",
+  "ambiente_inicio": {
+    "so": "WSL (Ubuntu) Ubuntu 26.04 LTS",
+    "usuario": "lucaskenway",
+    "host": "DESKTOP-AMJ5UEC",
+    "python": "3.14.4",
+    "terminal": ""
+  },
+  "itens": [
+    {
+      "numero": 1,
+      "tipo": "registro",
+      "descricao": "Moodle respondendo em localhost:8080",
+      "comando": "curl -s -o /dev/null -w 'HTTP %{http_code} -> %{redirect_url}\\n' http://localhost:8080/",
+      "shell": "direto",
+      "estilo": "terminal",
+      "cwd": "/mnt/c/Users/lucas/implement_Moodle",
+      "inicio": "2026-11-12T13:55:11-03:00",
+      "fim": "2026-11-12T13:55:11-03:00",
+      "duracao_s": 0.4045897389999027,
+      "retorno": 0,
+      "interrompido": false,
+      "redacoes": {},
+      "avisos": [],
+      "arquivos": [
+        {
+          "nome": "001_135511_moodle-respondendo-em-localhost-8080.txt",
+          "tipo": "txt",
+          "sha256": "22bd19c5b459997bc6fb92b45f1ad725a9c63b0670be55570284a41cffa0b254"
+        },
+        {
+          "nome": "001_135511_moodle-respondendo-em-localhost-8080_renderizada.png",
+          "tipo": "png-renderizada",
+          "sha256": "5eb95623325422420274b3d74ee7da80088829cdaf1c319fdbbf4b380615a0d4"
+        }
+      ]
+    },
+    {
+      "numero": 2,
+      "tipo": "registro",
+      "descricao": "health-check do template",
+      "comando": "bash scripts/health-check.sh http://localhost:8080",
+      "shell": "direto",
+      "estilo": "terminal",
+      "cwd": "/mnt/c/Users/lucas/implement_Moodle",
+      "inicio": "2026-11-12T13:55:14-03:00",
+      "fim": "2026-11-12T13:55:17-03:00",
+      "duracao_s": 2.687237195999842,
+      "retorno": 0,
+      "interrompido": false,
+      "redacoes": {},
+      "avisos": [],
+      "arquivos": [
+        {
+          "nome": "002_135514_health-check-do-template.txt",
+          "tipo": "txt",
+          "sha256": "fc0d88a94957bc9331ce0989cd5e19651b755d41dd06ea28d4b3a4594bcbb2d2"
+        },
+        {
+          "nome": "002_135514_health-check-do-template_renderizada.png",
+          "tipo": "png-renderizada",
+          "sha256": "4080cbee5301e0a33875b94acd8c27ec957dc577fb0e9ee8fc4cd3073e941b7b"
+        }
+      ]
+    },
+    {
+      "numero": 3,
+      "tipo": "registro",
+      "descricao": "commits locais",
+      "comando": "git log --oneline -3",
+      "shell": "direto",
+      "estilo": "terminal",
+      "cwd": "/mnt/c/Users/lucas/implement_Moodle",
+      "inicio": "2026-11-12T13:55:18-03:00",
+      "fim": "2026-11-12T13:55:18-03:00",
+      "duracao_s": 0.1499274999998761,
+      "retorno": 0,
+      "interrompido": false,
+      "redacoes": {},
+      "avisos": [],
+      "arquivos": [
+        {
+          "nome": "003_135518_commits-locais.txt",
+          "tipo": "txt",
+          "sha256": "39d34fa4b24373b5d11d280c4a762ef035753212d5f7f3b0114a0020f2287d0c"
+        },
+        {
+          "nome": "003_135518_commits-locais_renderizada.png",
+          "tipo": "png-renderizada",
+          "sha256": "716663f577d0e67ec40d1a5a36b391d4d2292f8aef575f00e5fa7eab0caccc22"
+        }
+      ]
+    }
+  ]
+}

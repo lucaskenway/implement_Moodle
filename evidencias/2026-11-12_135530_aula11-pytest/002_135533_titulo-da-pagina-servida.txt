@@ -1,0 +1,16 @@
+===== EVIDÊNCIA #002 — titulo da pagina servida =====
+Comando:            curl -sL http://localhost:8080/ | grep -o '<title>[^<]*'
+Shell:              bash
+Diretório:          /mnt/c/Users/lucas/implement_Moodle
+Ambiente:           WSL (Ubuntu) Ubuntu 26.04 LTS | usuário lucaskenway | host DESKTOP-AMJ5UEC
+Início:             2026-11-12T13:55:33.418-03:00
+Fim:                2026-11-12T13:55:34.006-03:00
+Duração:            0.589 s
+Código de retorno:  0 (sucesso)
+Dados sensíveis:    nenhum detectado
+Origem:             saída capturada diretamente do processo pela ferramenta evidencia 0.1.0
+
+----- SAÍDA (stdout e stderr intercalados, na ordem em que chegaram) -----
+<title>Installation | Moodle 4.1.22+ (Build: 20251212)
+
+----- FIM -----

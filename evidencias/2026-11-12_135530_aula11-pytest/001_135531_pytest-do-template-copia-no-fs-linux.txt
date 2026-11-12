@@ -1,0 +1,17 @@
+===== EVIDÊNCIA #001 — pytest do template (copia no FS Linux) =====
+Comando:            cd /home/lucaskenway/.claude-tmp/claude-1000/-mnt-c-Users-lucas-devops-20262/ca12936d-720f-4fb3-b2f8-18fc2d2414b0/scratchpad/moodle-copy && git pull -q && uv run --no-project --with pytest --with hypothesis --with pyyaml python -m pytest -q -p no:cacheprovider
+Shell:              bash
+Diretório:          /mnt/c/Users/lucas/implement_Moodle
+Ambiente:           WSL (Ubuntu) Ubuntu 26.04 LTS | usuário lucaskenway | host DESKTOP-AMJ5UEC
+Início:             2026-11-12T13:55:31.089-03:00
+Fim:                2026-11-12T13:55:32.867-03:00
+Duração:            1.778 s
+Código de retorno:  0 (sucesso)
+Dados sensíveis:    nenhum detectado
+Origem:             saída capturada diretamente do processo pela ferramenta evidencia 0.1.0
+
+----- SAÍDA (stdout e stderr intercalados, na ordem em que chegaram) -----
+..................................ssssssssss.......                      [100%]
+41 passed, 10 skipped in 0.89s
+
+----- FIM -----

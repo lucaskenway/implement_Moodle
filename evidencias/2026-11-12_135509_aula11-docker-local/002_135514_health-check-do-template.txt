@@ -1,0 +1,17 @@
+===== EVIDÊNCIA #002 — health-check do template =====
+Comando:            bash scripts/health-check.sh http://localhost:8080
+Shell:              direto
+Diretório:          /mnt/c/Users/lucas/implement_Moodle
+Ambiente:           WSL (Ubuntu) Ubuntu 26.04 LTS | usuário lucaskenway | host DESKTOP-AMJ5UEC
+Início:             2026-11-12T13:55:14.642-03:00
+Fim:                2026-11-12T13:55:17.329-03:00
+Duração:            2.687 s
+Código de retorno:  0 (sucesso)
+Dados sensíveis:    nenhum detectado
+Origem:             saída capturada diretamente do processo pela ferramenta evidencia 0.1.0
+
+----- SAÍDA (stdout e stderr intercalados, na ordem em que chegaram) -----
+[1;33m[…][0m Tentativa 1/3 — verificando http://localhost:8080 …
+[0;32m[✓][0m Moodle está respondendo em http://localhost:8080
+
+----- FIM -----
