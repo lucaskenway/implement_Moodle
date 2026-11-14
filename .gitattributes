@@ -1,0 +1,31 @@
+# Normaliza todos os arquivos de texto para LF no repositório
+* text=auto eol=lf
+
+# Shell scripts — LF obrigatório (CRLF quebra execução no Linux/EC2)
+*.sh text eol=lf
+
+# Terraform
+*.tf     text eol=lf
+*.tfvars text eol=lf
+
+# Docker
+Dockerfile   text eol=lf
+*.yml        text eol=lf
+*.yaml       text eol=lf
+.env.example text eol=lf
+
+# Documentação e configuração
+*.md   text eol=lf
+*.toml text eol=lf
+*.json text eol=lf
+*.py   text eol=lf
+
+# Binários — sem conversão de EOL
+*.png  binary
+*.jpg  binary
+*.jpeg binary
+*.gif  binary
+*.ico  binary
+*.zip  binary
+*.tgz  binary
+*.pdf  binary
