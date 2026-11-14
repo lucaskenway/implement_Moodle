@@ -15,6 +15,7 @@ on:
       - main
     paths:
       - "terraform/**"
+  workflow_dispatch:
 
 jobs:
   terraform-validate:

@@ -2,11 +2,16 @@ name: Docker Lint
 
 on:
   push:
+    branches:
+      - main
     paths:
       - 'docker/**'
   pull_request:
+    branches:
+      - main
     paths:
       - 'docker/**'
+  workflow_dispatch:
 
 jobs:
   docker-lint:
