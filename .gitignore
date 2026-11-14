@@ -1,4 +1,4 @@
-# Logs
+﻿# Logs
 logs
 *.log
 npm-debug.log*
@@ -46,7 +46,6 @@ web_modules/
 
 # TypeScript cache
 *.tsbuildinfo
-.kiro/
 
 # Optional npm cache directory
 .npm
@@ -77,6 +76,10 @@ terraform.tfstate
 terraform.tfstate.backup
 .terraform/
 *.tfplan
+*.tfstate.*
+tfplan
+.terraform.tfstate.lock.info
+crash.log
 
 # Credenciais e chaves privadas
 *.pem
@@ -166,3 +169,4 @@ vite.config.ts.timestamp-*
 
 # Turbo Repo
 .turbo
+
