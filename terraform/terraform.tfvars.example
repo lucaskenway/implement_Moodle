@@ -1,0 +1,36 @@
+# =============================================================================
+# terraform.tfvars.example — Template de variáveis do projeto Moodle AWS
+#
+# TODO: Copie este arquivo para terraform.tfvars e preencha os valores reais:
+#   cp terraform/terraform.tfvars.example terraform/terraform.tfvars
+#
+# ATENÇÃO: terraform.tfvars está no .gitignore — nunca o commite.
+# =============================================================================
+
+# Região AWS (mantenha us-east-1 para o AWS Learner Lab)
+aws_region = "us-east-1"
+
+# TODO: Ajuste o nome do projeto se necessário
+project_name = "moodle-challenge"
+
+# TODO: Restrinja ao seu IP público em produção (ex: "203.0.113.10/32")
+#       Use: curl -s https://checkip.amazonaws.com
+ssh_allowed_cidr = "0.0.0.0/0"
+
+# TODO: Preencha com a URL HTTPS do seu fork do repositório
+repo_url = ""
+
+# Branch a clonar na EC2 (mantenha o branch atual)
+repo_branch = "feat/aula-11-docker-local"
+
+# Banco de dados
+db_name = "moodle"
+
+# TODO: Defina o usuário do banco — somente letras e números
+db_username = ""
+
+# TODO: Defina a senha do banco — somente letras e números, mínimo 8 caracteres
+db_password = ""
+
+# TODO: Defina a senha do administrador do Moodle — somente letras e números
+moodle_admin_password = ""
