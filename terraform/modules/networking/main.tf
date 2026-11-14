@@ -95,7 +95,7 @@ resource "aws_security_group" "ec2" {
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    description = "HTTP publico — acesso ao Moodle"
+    description = "HTTP publico - acesso ao Moodle"
     from_port   = 80
     to_port     = 80
     protocol    = "tcp"
@@ -134,7 +134,7 @@ resource "aws_security_group" "rds" {
   vpc_id      = aws_vpc.main.id
 
   ingress {
-    description     = "PostgreSQL — origem restrita ao SG da EC2"
+    description     = "PostgreSQL - origem restrita ao SG da EC2"
     from_port       = 5432
     to_port         = 5432
     protocol        = "tcp"

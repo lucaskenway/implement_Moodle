@@ -28,7 +28,7 @@ data "aws_ami" "amazon_linux_2023" {
 # aws_iam_instance_profile. Use sempre via data source.
 # -----------------------------------------------------------------------------
 data "aws_iam_instance_profile" "lab_role" {
-  name = "LabRole"
+  name = "LabInstanceProfile"
 }
 
 # -----------------------------------------------------------------------------
