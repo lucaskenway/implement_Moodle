@@ -20,9 +20,6 @@ jobs:
   terraform-validate:
     name: Validate Terraform
     runs-on: ubuntu-latest
-    # Só executa se o arquivo terraform/versions.tf existir, pois os alunos
-    # precisam criar o diretório terraform/ como parte do desafio.
-    if: ${{ hashFiles('terraform/versions.tf') != '' }}
 
     steps:
       # Faz o checkout do repositório para que o runner tenha acesso ao código

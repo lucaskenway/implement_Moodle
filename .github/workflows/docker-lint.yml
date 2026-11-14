@@ -23,6 +23,10 @@ jobs:
       - name: Lint do Dockerfile com hadolint
         run: docker run --rm -i hadolint/hadolint < docker/Dockerfile
 
+      # Copia .env.example para .env para que o docker compose config encontre o arquivo
+      - name: Preparar .env para validação
+        run: cp docker/.env.example docker/.env
+
       # Valida a sintaxe e a integridade do docker-compose.yml sem subir os serviços
       # TODO: se você tiver um ambiente de testes disponível, pode estender este step
       #       executando `docker compose -f docker/docker-compose.yml up --build -d`
