@@ -75,6 +75,8 @@ web_modules/
 *.tfvars
 terraform.tfstate
 terraform.tfstate.backup
+.terraform/
+*.tfplan
 
 # Credenciais e chaves privadas
 *.pem
