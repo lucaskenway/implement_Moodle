@@ -14,6 +14,10 @@ FROM php:8.1-apache
 # Instala as dependências de sistema necessárias para as extensões PHP
 # e ferramentas utilitárias do ambiente de produção
 # -----------------------------------------------------------------------------
+# DL3008 ignorado: fixar versões do apt quebra o build quando a imagem base
+# php:8.1-apache é atualizada e as versões antigas somem do repositório Debian.
+# TODO: fixe as versões (pacote=versão) se precisar de builds 100% reprodutíveis.
+# hadolint ignore=DL3008
 RUN apt-get update && apt-get install -y --no-install-recommends \
     # pkg-config — necessário para que o configure do PHP encontre as bibliotecas
     pkg-config \
@@ -56,6 +60,8 @@ RUN docker-php-ext-configure gd --with-jpeg
 #   - zlib    (built-in)
 #   - json    (built-in no PHP 8+)
 # -----------------------------------------------------------------------------
+# DL3059 ignorado: RUNs separados de propósito, um por etapa comentada (didático).
+# hadolint ignore=DL3059
 RUN docker-php-ext-install \
     # Codificação multibyte de strings (obrigatório para i18n no Moodle)
     mbstring \
@@ -69,6 +75,8 @@ RUN docker-php-ext-install \
     intl \
     # Driver PDO para PostgreSQL (conexão com o banco de dados)
     pdo_pgsql \
+    # Driver nativo PostgreSQL (pg_connect) — exigido pelo Moodle (dbtype=pgsql)
+    pgsql \
     # Processamento de imagens (thumbnails, avatares de usuários)
     gd \
     # Cache de opcodes PHP (melhora performance de produção)
@@ -141,6 +149,8 @@ RUN ln -s /var/moodledata /var/www/moodledata
 # Habilita os módulos Apache necessários para o Moodle
 # (rewrite é obrigatório para URLs limpas)
 # -----------------------------------------------------------------------------
+# DL3059 ignorado: RUNs separados de propósito, um por etapa comentada (didático).
+# hadolint ignore=DL3059
 RUN a2enmod rewrite
 
 # -----------------------------------------------------------------------------
