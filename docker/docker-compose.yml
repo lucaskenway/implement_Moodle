@@ -53,7 +53,7 @@ services:
 
     # TODO: Altere a porta do host (8080) caso ela já esteja em uso na sua máquina
     ports:
-      - "8080:80"
+      - "${MOODLE_HTTP_PORT:-8080}:80"
 
     # Carrega as variáveis de ambiente a partir do .env local (fora do Git)
     env_file:
