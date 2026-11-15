@@ -17,7 +17,7 @@ exec > /var/log/user-data.log 2>&1
 echo "=== [1/6] Instalando Docker e Git ==="
 dnf install -y docker git
 
-echo "=== [2/6] Instalando Docker Compose $${compose_version} como plugin ==="
+echo "=== [2/6] Instalando Docker Compose ${compose_version} como plugin ==="
 # O docker-compose-plugin nao esta disponivel via dnf no Amazon Linux 2023.
 # Instala o binario oficial com versao fixa para garantir reprodutibilidade.
 mkdir -p /usr/local/lib/docker/cli-plugins
