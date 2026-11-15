@@ -29,8 +29,8 @@ db_name = "moodle"
 # TODO: Defina o usuário do banco — somente letras e números
 db_username = ""
 
-# TODO: Defina a senha do banco — somente letras e números, mínimo 8 caracteres
+# TODO: Defina a senha do banco — somente letras e números, mínimo 12 caracteres
 db_password = ""
 
-# TODO: Defina a senha do administrador do Moodle — somente letras e números
+# TODO: Defina a senha do administrador do Moodle — somente letras e números, mínimo 12 caracteres
 moodle_admin_password = ""

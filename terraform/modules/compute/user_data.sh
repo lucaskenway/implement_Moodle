@@ -5,8 +5,8 @@
 # Toda a saída é redirecionada para /var/log/user-data.log para diagnóstico.
 #
 # REGRAS DE ESCAPE (arquivo processado por templatefile() do Terraform):
-#   $${var}   — variável Terraform, substituída antes do envio à EC2
-#   $${VAR}  — variável shell, vira $VAR após o templatefile()
+#   Variaveis Terraform: escreva VAR entre chaves com cifrao simples (sem espaco)
+#   Variaveis shell: use cifrao duplo, ex: COMPOSE_VERSION vira cifrao-VAR no shell
 #
 # TODO: Após o deploy, verifique o log com:
 #   ssh -i labsuser.pem ec2-user@<EC2_DNS> "cat /var/log/user-data.log"
