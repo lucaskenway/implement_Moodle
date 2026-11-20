@@ -30,7 +30,7 @@ Antes de começar, verifique se você tem as seguintes ferramentas instaladas e 
 │   └── workflows/                       # Pipelines de CI/CD (GitHub Actions)
 │       ├── docker-lint.yml              #   - Lint do Dockerfile (hadolint)
 │       ├── health-check.yml             #   - Health check manual (workflow_dispatch)
-│       ├── terraform-plan.yml           #   - Stub: terraform plan (a implementar)
+│       ├── terraform-plan.yml           #   - terraform plan em pull_request e workflow_dispatch; comenta o plan no PR
 │       └── terraform-validate.yml       #   - fmt-check + validate
 ├── docker/                              # Ambiente Docker local de referência (funcional)
 │   ├── .env.example                     #   - Variáveis de ambiente documentadas
@@ -142,6 +142,32 @@ Para a sequência completa de comandos (`init`, `plan`, `apply`, `destroy`) e ex
 
 
 
+## Deploy na AWS
+
+> Requer credenciais válidas do AWS Learner Lab em `~/.aws/credentials` e um `terraform/terraform.tfvars` preenchido (use `terraform.tfvars.example` como base).
+
+```bash
+# 1. Inicializar os providers e módulos
+terraform -chdir=terraform init
+
+# 2. Revisar o que será criado (sem custo)
+terraform -chdir=terraform plan
+
+# 3. Criar a infraestrutura (~2 min para EC2 + RDS)
+terraform -chdir=terraform apply
+
+# 4. Aguardar o boot da EC2 (~3–5 min) e pegar a URL
+terraform -chdir=terraform output ec2_public_dns   # DNS completo
+terraform -chdir=terraform output moodle_url       # http://<dns> pronto para colar no navegador
+
+# 5. Ao encerrar a sessão do Lab, destruir tudo para não consumir crédito
+terraform -chdir=terraform destroy
+```
+
+> As credenciais do Learner Lab expiram em ~4 h. Renove-as no portal AWS Academy antes de rodar `apply` ou `plan`. O estado (`terraform.tfstate`) fica local e nunca é commitado.
+
+
+
 ## CI/CD
 
 O repositório inclui pipelines de GitHub Actions em `.github/workflows/`:
@@ -150,7 +176,7 @@ O repositório inclui pipelines de GitHub Actions em `.github/workflows/`:
 |---|---|---|
 | [`terraform-validate.yml`](.github/workflows/terraform-validate.yml) | `push` / `pull_request` em `main` | Executa `terraform fmt -check` e `terraform validate` (falha listando arquivos com problemas de formatação) |
 | [`docker-lint.yml`](.github/workflows/docker-lint.yml) | `push` / `pull_request` em `main` | Executa `hadolint` no `docker/Dockerfile` |
-| [`terraform-plan.yml`](.github/workflows/terraform-plan.yml) | `workflow_dispatch` | **Stub** com `# TODO:` — você implementa o `terraform plan` configurando os secrets `AWS_ACCESS_KEY_ID` e `AWS_SECRET_ACCESS_KEY` |
+| [`terraform-plan.yml`](.github/workflows/terraform-plan.yml) | `pull_request` (paths `terraform/**`) + `workflow_dispatch` | Executa `terraform validate` + `terraform plan`; posta o output do plan como comentário na PR; falha o job se o plan falhar |
 | [`health-check.yml`](.github/workflows/health-check.yml) | `workflow_dispatch` (input `moodle_url`) | Torna `health-check.sh` executável e o roda contra a URL informada |
 
 > Cada step dos workflows contém um comentário explicativo descrevendo o que a etapa faz.
