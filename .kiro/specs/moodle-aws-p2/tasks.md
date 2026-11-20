@@ -104,11 +104,11 @@
 - [x] 7.1 Commit: docker-compose.yml — "fix(docker): porta configuravel e env_file simples"
 - [x] 7.2 Commit: workflows (docker-lint, terraform-validate, terraform-plan) — "ci: corrige validate e implementa terraform-plan"
 - [x] 7.4 Commit: terraform/ — "feat(terraform): implementa modulos networking, database e compute"
-- [ ] 7.5 Commit: docs/architecture-design.md
+- [x] 7.5 Commit: docs/architecture-design.md
        "docs(arch): preenche design de arquitetura da solucao AWS"
-- [ ] 7.6 Atualizar spec (.kiro/) com tarefas concluídas
-- [ ] 7.7 Push fork feat/aula-11-docker-local (nunca no origin, que é o repositório do professor)
-- [ ] 7.8 Verificar pytest final: 64 passed, 0 skipped
+- [x] 7.6 Atualizar spec (.kiro/) com tarefas concluídas
+- [x] 7.7 Push da branch fix/p2-correcoes no fork (lucaskenway) — nunca no origin, que é o repositório do professor
+- [x] 7.8 Verificar pytest final: 64 passed, 0 skipped
 
 ---
 
