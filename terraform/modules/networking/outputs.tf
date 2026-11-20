@@ -9,8 +9,13 @@ output "vpc_id" {
 }
 
 output "public_subnet_id" {
-  description = "ID da subnet pública onde a EC2 será criada."
+  description = "ID da subnet pública principal (public_a, us-east-1a) onde a EC2 é criada."
   value       = aws_subnet.public_a.id
+}
+
+output "public_subnet_ids" {
+  description = "Lista de IDs das duas subnets públicas (public_a e public_b, AZs distintas)."
+  value       = [aws_subnet.public_a.id, aws_subnet.public_b.id]
 }
 
 output "private_subnet_ids" {
