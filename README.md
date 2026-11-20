@@ -215,6 +215,14 @@ Os testes cobrem, entre outros: extensões PHP obrigatórias no Dockerfile, aus�
 
 
 
+## Dificuldades encontradas
+
+- **Disco cheio no primeiro deploy:** o build da imagem Docker falhou com `no space left on device` porque o disco padrão da AMI tinha apenas 2 GB. Diagnóstico feito pelo `/var/log/user-data.log` via SSH; corrigido adicionando `root_block_device` com `volume_size = 20` e `volume_type = "gp3"` no `aws_instance.moodle` (evidência 005).
+
+- **SSH bloqueado após troca de sessão:** o IP público do aluno mudou entre sessões do Learner Lab e o acesso SSH foi recusado pelo Security Group — comportamento esperado do `/32`. Correção simples: atualizar `ssh_allowed_cidr` no `terraform.tfvars` com o novo IP e rodar `terraform apply` (apenas a regra do SG é modificada).
+
+
+
 ## Avaliação
 
 A avaliação do desafio segue a rubrica detalhada em [`docs/evaluation-rubric.md`](docs/evaluation-rubric.md), que pontua infraestrutura provisionada, Moodle acessível, segurança, documentação e o desenho técnico de arquitetura.
