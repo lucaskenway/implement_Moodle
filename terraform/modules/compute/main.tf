@@ -47,6 +47,12 @@ resource "aws_instance" "moodle" {
   # TODO: Baixe o labsuser.pem no portal AWS Academy para acessar via SSH
   key_name = "vockey"
 
+  # Disco ampliado para 20 GB gp3 — o build da imagem Docker esgotava o disco padrão da AMI (2 GB)
+  root_block_device {
+    volume_size = 20
+    volume_type = "gp3"
+  }
+
   user_data = templatefile("${path.module}/user_data.sh", {
     rds_address           = var.rds_address
     rds_port              = var.rds_port
