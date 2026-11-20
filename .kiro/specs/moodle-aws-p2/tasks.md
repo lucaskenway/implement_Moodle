@@ -56,6 +56,49 @@
 
 ---
 
+## Etapa 6 — Correções e melhorias (prova P2)
+
+- [x] 6.1 **Segunda subnet pública em AZ diferente** (`terraform/modules/networking/`)
+       Adicionar `aws_subnet.public_b` (10.0.4.0/24, us-east-1b, map_public_ip_on_launch = true).
+       Adicionar `aws_route_table_association.public_b` associando à route table pública.
+       Adicionar output `public_subnet_ids` (lista com IDs de public_a e public_b).
+       Manter output `public_subnet_id` (aponta para public_a — EC2 continua lá).
+       Verificar: `terraform validate` passa; pytest passa.
+
+- [x] 6.2 **Tipo da EC2: t3.medium → t3.micro**
+       Alterar default de `ec2_instance_type` para `"t3.micro"` em:
+       `terraform/variables.tf` e `terraform/modules/compute/variables.tf`.
+       Verificar: `terraform validate` passa; pytest passa.
+
+- [x] 6.3 **SSH porta 22 restrito ao IP do aluno — tornar obrigatório**
+       Remover default `"0.0.0.0/0"` de `ssh_allowed_cidr` em `terraform/variables.tf`
+       e `terraform/modules/networking/variables.tf`.
+       Adicionar bloco `validation` em ambos os arquivos que rejeita qualquer CIDR que
+       não termine em `/32` (regex `^\\d+\\.\\d+\\.\\d+\\.\\d+/32$`).
+       Atualizar `terraform/terraform.tfvars.example` com placeholder `SEU.IP.PUBLICO.AQUI/32`.
+       Verificar: `terraform validate` passa; pytest passa.
+
+- [x] 6.4 **Outputs do módulo compute: renomear para `public_dns` e `public_ip`**
+       Em `terraform/modules/compute/outputs.tf`: outputs nomeados `public_dns` e `public_ip`
+       (referenciando `aws_instance.moodle.public_dns` e `.public_ip`).
+       Em `terraform/outputs.tf`: manter nomes externos `ec2_public_dns` e `ec2_public_ip`
+       apontando para `module.compute.public_dns` e `module.compute.public_ip`.
+       Adicionar outputs `public_dns`, `public_ip` e `moodle_url` no root `outputs.tf`.
+       Verificar: `terraform validate` passa; pytest passa.
+
+- [x] 6.5 **terraform-plan.yml: PR trigger + comentário do plan**
+       Adicionar trigger `pull_request` com paths `terraform/**` e `.github/workflows/terraform-plan.yml`.
+       Adicionar `permissions: contents: read` e `pull-requests: write`.
+       Adicionar secret `TF_VAR_ssh_allowed_cidr` nos env do job.
+       Adicionar step `terraform validate -no-color` antes do plan.
+       Configurar `terraform plan -no-color` com `continue-on-error: true` e `id: plan`.
+       Adicionar step `actions/github-script` que posta o output do plan como comentário
+       no PR (condicional: `if: github.event_name == 'pull_request'`), saída cortada em 60000 caracteres.
+       Adicionar step final que falha com `exit 1` se `steps.plan.outcome == 'failure'`.
+       Verificar: arquivo yaml válido; pytest passa.
+
+---
+
 ## Etapa 7 — Commit e push final
 
 - [x] 7.1 Commit: docker-compose.yml — "fix(docker): porta configuravel e env_file simples"

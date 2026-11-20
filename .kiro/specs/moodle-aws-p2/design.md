@@ -10,12 +10,13 @@ GitHub repo (fork)
 ┌─────────────────────────────────────────────────────────┐
 │  VPC 10.0.0.0/16  (us-east-1)                          │
 │                                                         │
-│  ┌─────────────────────────────┐                        │
-│  │ Subnet pública 10.0.1.0/24 │◄── IGW ◄── Internet    │
-│  │  EC2 t3.medium (AL2023)    │    :80                  │
-│  │  Docker + Moodle 4.1       │                         │
-│  │  SG-EC2: 80+22 in          │                         │
-│  └────────────┬────────────────┘                        │
+│  ┌──────────────────────────┐  ┌──────────────────────┐ │
+│  │ Subnet pública-a         │  │ Subnet pública-b     │ │
+│  │ 10.0.1.0/24 us-east-1a  │  │ 10.0.4.0/24 us-east-1b│ │
+│  │  EC2 t3.micro (AL2023)  │  │ (reservada p/ LB)    │ │
+│  │  Docker + Moodle 4.1    │◄── IGW ◄── Internet :80  │ │
+│  │  SG-EC2: 80+22 in       │                          │ │
+│  └────────────┬─────────────┘                          │
 │               │ :5432 (SG-RDS permite só SG-EC2)        │
 │  ┌────────────▼────────────────┐                        │
 │  │ Subnet privada-a 10.0.2.0  │                        │
@@ -33,11 +34,12 @@ GitHub repo (fork)
 
 ### networking
 Entradas: project_name, vpc_cidr, ssh_allowed_cidr
-Saídas: vpc_id, public_subnet_id, private_subnet_ids, ec2_security_group_id, rds_security_group_id
+Saídas: vpc_id, public_subnet_id (public_a, compatibilidade), public_subnet_ids (lista), private_subnet_ids, ec2_security_group_id, rds_security_group_id
 
 Decisões:
 - `enable_dns_hostnames = true` — necessário para o DNS público da EC2 funcionar
-- Route table separada para a subnet pública; subnets privadas ficam na route table main (sem rota IGW)
+- Duas subnets públicas em AZs distintas (us-east-1a e us-east-1b) — permite uso futuro de Load Balancer (ALB exige ≥ 2 AZs)
+- Route table separada para as subnets públicas; subnets privadas ficam na route table main (sem rota IGW)
 - SG RDS usa `security_groups = [ec2_sg_id]` como origem — nunca cidr_blocks
 
 ### database
@@ -53,13 +55,15 @@ Decisões:
 Entradas: project_name, public_subnet_id, ec2_security_group_id, ec2_instance_type,
           rds_address, rds_port, db_name, db_username, db_password,
           moodle_admin_password, repo_url, repo_branch
-Saídas: ec2_public_dns, ec2_instance_id
+Saídas: public_dns, public_ip, ec2_instance_id
 
 Decisões:
 - AMI via data source (most_recent = true) — sem fixar ID que muda por região
 - key_name = "vockey" — key pair pré-existente no Learner Lab
 - LabRole via data source — restrição do Learner Lab
 - user_data via templatefile() — injeta variáveis Terraform antes do envio
+- Tipo `t3.micro` (1 vCPU, 1 GB RAM): exigido pela prova. Impacto: Moodle pode levar
+  mais tempo para inicializar e responder sob carga; aceitável para ambiente de avaliação.
 
 ---
 
@@ -119,8 +123,8 @@ O `docker-lint.yml` copia `.env.example` → `.env` antes de validar.
 | aws_region | string | não | "us-east-1" |
 | project_name | string | não | "moodle-challenge" |
 | vpc_cidr | string | não | "10.0.0.0/16" |
-| ec2_instance_type | string | não | "t3.medium" |
-| ssh_allowed_cidr | string | não | "0.0.0.0/0" + aviso |
+| ec2_instance_type | string | não | "t3.micro" |
+| ssh_allowed_cidr | string | **sim** | — (obrigatório; use seu IP: `SEU.IP.PUBLICO.AQUI/32`) |
 | db_name | string | não | "moodle" |
 | db_username | string | sim | — |
 | db_password | string | sim | — |
@@ -133,12 +137,17 @@ O `docker-lint.yml` copia `.env.example` → `.env` antes de validar.
 ## CI/CD
 
 ### terraform-plan.yml
-- Trigger: workflow_dispatch
+- Triggers: `workflow_dispatch` e `pull_request` (paths: `terraform/**`, `.github/workflows/terraform-plan.yml`)
+- Permissions: `contents: read` e `pull-requests: write`
 - Secrets AWS: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN
-- Secrets TF: TF_VAR_db_username, TF_VAR_db_password, TF_VAR_moodle_admin_password, TF_VAR_repo_url
+- Secrets TF: TF_VAR_db_username, TF_VAR_db_password, TF_VAR_moodle_admin_password,
+  TF_VAR_repo_url, TF_VAR_ssh_allowed_cidr
   (o Terraform lê variáveis com prefixo TF_VAR_ automaticamente — evita prompt interativo)
 - Steps: checkout → configure-aws-credentials@v4 → setup-terraform@v3 →
-  terraform init -backend=false → terraform plan
+  terraform init -backend=false → terraform validate -no-color →
+  terraform plan -no-color (continue-on-error, id: plan) →
+  postar output como comentário no PR (actions/github-script, só em pull_request) →
+  falhar o job se o plan falhou (exit 1)
 
 ### terraform-validate.yml
 - Remover `if: ${{ hashFiles('terraform/versions.tf') != '' }}` do job
@@ -156,5 +165,5 @@ O `docker-lint.yml` copia `.env.example` → `.env` antes de validar.
 | Senhas no tfstate | tfstate no .gitignore; nunca commitado |
 | Senhas no user_data | Senhas só com letras+números; user_data visível no console AWS (limitação aceita) |
 | RDS exposto | publicly_accessible=false + subnet privada + SG restrito |
-| SSH aberto | ssh_allowed_cidr com aviso; restringir ao IP do aluno em produção |
+| SSH aberto | ssh_allowed_cidr **obrigatório**, sem default; validation rejeita `0.0.0.0/0` e exige `/32`; aluno preenche com seu IP |
 | Credenciais AWS | Nunca commitadas; rotacionar antes de 3h de sessão |
