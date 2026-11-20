@@ -1,15 +1,21 @@
-# Tasks — moodle-aws-p2
+# Implementation Plan
 
-## Etapa 1 — Preparação do repositório [CONCLUÍDA]
+## Overview
+
+Plano de implementação da Prova P2 — Moodle Docker AWS Challenge.
+Cobre preparação do repositório, infraestrutura Terraform, workflows CI/CD,
+documento de arquitetura, correções exigidas pela prova e deploy real na AWS.
+
+## Tasks
+
+### Etapa 1 — Preparação do repositório [CONCLUÍDA]
 
 - [x] 1.1 Corrigir .gitignore (remove .kiro/, adiciona padrões Terraform)
 - [x] 1.2 Criar .gitattributes (normaliza EOL para LF)
 - [x] 1.3 Criar docker/.dockerignore (exclui .env do contexto de build)
 - [x] 1.4 Corrigir docker/Dockerfile (extensão pgsql, hadolint ignores)
 
----
-
-## Etapa 2 — Infraestrutura Terraform [CONCLUÍDA]
+### Etapa 2 — Infraestrutura Terraform [CONCLUÍDA]
 
 - [x] 2.1 Criar `terraform/versions.tf`
 - [x] 2.2 Criar `terraform/modules/networking/variables.tf`
@@ -31,9 +37,17 @@
 - [x] 2.18 Verificar: todos os arquivos .tf e .sh (exceto versions.tf) têm # TODO:
 - [x] 2.19 Rodar pytest — 64 passed, 0 skipped
 
----
+### Etapa 3 — Deploy real na AWS [OPCIONAL — CONCLUÍDA em 19/11/2026]
 
-## Etapa 4 — Documento de arquitetura
+- [x] 3.1 Configurar credenciais do Learner Lab em ~/.aws/credentials
+- [x] 3.2 Criar terraform/terraform.tfvars com valores reais (fora do Git)
+- [x] 3.3 terraform init && terraform plan — revisar saída (Plan: 14 to add)
+- [x] 3.4 terraform apply — anotar ec2_public_dns e rds_endpoint (evidência 004)
+- [x] 3.5 Aguardar boot da EC2 (~3-5 min) e verificar /var/log/user-data.log (falhou por disco cheio, evidência 005; corrigido com disco de 20 GB, Moodle no ar: evidências 006 e 006b)
+- [x] 3.6 scripts/health-check.sh <ec2_public_dns> — deve retornar exit 0 (evidências 007 e 008)
+- [x] 3.7 terraform destroy ao encerrar a sessão do Lab (14 destroyed, evidência 009)
+
+### Etapa 4 — Documento de arquitetura
 
 - [x] 4.1 Revisar `docs/architecture-design.md`
        Remover todos os `<!-- TODO -->` restantes (diagrama, link custo)
@@ -45,18 +59,14 @@
 
 - [x] 4.4 Verificar: `grep -c "TODO" docs/architecture-design.md` retorna 0
 
----
-
-## Etapa 5 — Workflows CI/CD [CONCLUÍDA]
+### Etapa 5 — Workflows CI/CD [CONCLUÍDA]
 
 - [x] 5.1 Reescrever `.github/workflows/terraform-plan.yml`
 - [x] 5.2 Corrigir `.github/workflows/terraform-validate.yml` (remove guard hashFiles)
 - [x] 5.3 Corrigir `.github/workflows/docker-lint.yml` (copia .env.example antes do config)
 - [x] 5.4 Verificar: pytest passa (test_workflow_step_comments.py)
 
----
-
-## Etapa 6 — Correções e melhorias (prova P2)
+### Etapa 6 — Correções e melhorias (prova P2)
 
 - [x] 6.1 **Segunda subnet pública em AZ diferente** (`terraform/modules/networking/`)
        Adicionar `aws_subnet.public_b` (10.0.4.0/24, us-east-1b, map_public_ip_on_launch = true).
@@ -97,9 +107,7 @@
        Adicionar step final que falha com `exit 1` se `steps.plan.outcome == 'failure'`.
        Verificar: arquivo yaml válido; pytest passa.
 
----
-
-## Etapa 7 — Commit e push final
+### Etapa 7 — Commit e push final
 
 - [x] 7.1 Commit: docker-compose.yml — "fix(docker): porta configuravel e env_file simples"
 - [x] 7.2 Commit: workflows (docker-lint, terraform-validate, terraform-plan) — "ci: corrige validate e implementa terraform-plan"
@@ -110,14 +118,33 @@
 - [x] 7.7 Push da branch fix/p2-correcoes no fork (lucaskenway) — nunca no origin, que é o repositório do professor
 - [x] 7.8 Verificar pytest final: 64 passed, 0 skipped
 
----
+## Notes
 
-## Etapa 3 — Deploy real na AWS [OPCIONAL — CONCLUÍDA em 19/11/2026]
+- Push sempre no remoto `fork` (lucaskenway). Nunca no `origin` (repositório do professor).
+- Shell é PowerShell no host: separar comandos com `;`, nunca `&&`.
+- Terraform roda via Docker ou WSL — não está instalado nativamente no Windows.
+- Senhas: só letras e números, mínimo 12 caracteres (validation no variables.tf). Sem SSM por enquanto.
+- No `user_data.sh`, qualquer `${` que não seja variável do Terraform precisa virar `$${`.
+- Todo `.tf` (exceto versions.tf), `.yml` e `.sh` em docker/ e terraform/ precisa de um `# TODO:`.
+- No `docs/architecture-design.md` nenhum `<!-- TODO -->` pode sobrar (zera a categoria 4).
+- `ssh_allowed_cidr` é obrigatório, sem default — preencher com `SEU.IP.PUBLICO.AQUI/32`.
+- Disco da EC2 ampliado para 20 GB gp3 (`root_block_device`) após falha de "no space left on device" no primeiro deploy.
 
-- [x] 3.1 Configurar credenciais do Learner Lab em ~/.aws/credentials
-- [x] 3.2 Criar terraform/terraform.tfvars com valores reais (fora do Git)
-- [x] 3.3 terraform init && terraform plan — revisar saída (Plan: 14 to add)
-- [x] 3.4 terraform apply — anotar ec2_public_dns e rds_endpoint (evidência 004)
-- [x] 3.5 Aguardar boot da EC2 (~3-5 min) e verificar /var/log/user-data.log (falhou por disco cheio, evidência 005; corrigido com disco de 20 GB, Moodle no ar: evidências 006 e 006b)
-- [x] 3.6 scripts/health-check.sh <ec2_public_dns> — deve retornar exit 0 (evidências 007 e 008)
-- [x] 3.7 terraform destroy ao encerrar a sessão do Lab (14 destroyed, evidência 009)
+## Task Dependency Graph
+
+```
+1.1 → 1.2 → 1.3 → 1.4
+                       ↓
+2.1 → 2.2 → 2.3 → 2.4 → 2.5 → 2.6 → 2.7 → 2.8 → 2.9 → 2.10 → 2.11
+→ 2.12 → 2.13 → 2.14 → 2.15 → 2.16 → 2.17 → 2.18 → 2.19
+                                                              ↓
+5.1 → 5.2 → 5.3 → 5.4
+                       ↓
+6.1 → 6.2 → 6.3 → 6.4 → 6.5
+                              ↓
+4.1 → 4.2 → 4.3 → 4.4
+                       ↓
+7.1 → 7.2 → 7.4 → 7.5 → 7.6 → 7.7 → 7.8
+                                           ↓
+3.1 → 3.2 → 3.3 → 3.4 → 3.5 → 3.6 → 3.7
+```
