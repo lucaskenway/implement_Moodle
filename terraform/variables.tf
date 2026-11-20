@@ -24,17 +24,17 @@ variable "vpc_cidr" {
 variable "ec2_instance_type" {
   type        = string
   description = "Tipo da instância EC2 para o Moodle."
-  default     = "t3.medium"
+  default     = "t3.micro"
 }
 
 variable "ssh_allowed_cidr" {
   type        = string
-  default     = "0.0.0.0/0"
-  description = <<-DESC
-    CIDR autorizado para SSH (porta 22) na EC2.
-    AVISO DE SEGURANÇA: padrão 0.0.0.0/0 permite acesso de qualquer origem.
-    TODO: Restrinja ao seu IP público (ex: 203.0.113.10/32) em produção.
-  DESC
+  description = "CIDR do IP público do aluno no formato x.x.x.x/32, único endereço autorizado a acessar a porta 22 da EC2."
+
+  validation {
+    condition     = can(cidrhost(var.ssh_allowed_cidr, 0)) && endswith(var.ssh_allowed_cidr, "/32") && var.ssh_allowed_cidr != "0.0.0.0/0"
+    error_message = "ssh_allowed_cidr deve ser um único IP no formato x.x.x.x/32 (ex: 203.0.113.10/32). O valor 0.0.0.0/0 não é permitido."
+  }
 }
 
 variable "db_name" {

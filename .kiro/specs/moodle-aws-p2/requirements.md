@@ -29,22 +29,23 @@ O diretório `terraform/` deve conter:
 - `versions.tf` — provider AWS ~> 5.0, required_version >= 1.5
 - `main.tf` — instancia os três módulos
 - `variables.tf` — variáveis raiz
-- `outputs.tf` — ec2_public_dns, rds_endpoint, vpc_id
+- `outputs.tf` — ec2_public_dns, ec2_public_ip, public_dns, public_ip, moodle_url, rds_endpoint, vpc_id
 - `terraform.tfvars.example` — template sem valores reais
 
 ### R2.2 Módulo networking
 Recursos obrigatórios:
 - `aws_vpc`: CIDR 10.0.0.0/16, enable_dns_hostnames = true
-- `aws_subnet` pública: 10.0.1.0/24, us-east-1a, map_public_ip_on_launch = true
+- `aws_subnet` pública-a: 10.0.1.0/24, us-east-1a, map_public_ip_on_launch = true
+- `aws_subnet` pública-b: 10.0.4.0/24, us-east-1b, map_public_ip_on_launch = true
 - `aws_subnet` privada-a: 10.0.2.0/24, us-east-1a
 - `aws_subnet` privada-b: 10.0.3.0/24, us-east-1b
 - `aws_internet_gateway`
 - `aws_route_table` com rota 0.0.0.0/0 → IGW
-- `aws_route_table_association` na subnet pública
+- `aws_route_table_association` nas duas subnets públicas (public_a e public_b)
 - `aws_security_group` ec2: ingress 80 de 0.0.0.0/0, ingress 22 de var.ssh_allowed_cidr, egress livre
 - `aws_security_group` rds: ingress 5432 somente do SG da EC2 (security_groups, nunca cidr)
 
-Outputs: vpc_id, public_subnet_id, private_subnet_ids (lista), ec2_security_group_id, rds_security_group_id
+Outputs: vpc_id, public_subnet_id (public_a, para compatibilidade), public_subnet_ids (lista com public_a e public_b), private_subnet_ids (lista), ec2_security_group_id, rds_security_group_id
 
 ### R2.3 Módulo database
 Recursos obrigatórios:
@@ -60,13 +61,13 @@ Outputs: rds_address (somente hostname, via .address), rds_port (via .port)
 Recursos obrigatórios:
 - `data "aws_ami"`: filter name = "al2023-ami-*-x86_64", owners = ["amazon"], most_recent = true
 - `data "aws_iam_instance_profile"`: name = "LabRole"
-- `aws_instance`: t3.medium, subnet pública, SG ec2, key_name = "vockey",
+- `aws_instance`: t3.micro, subnet pública, SG ec2, key_name = "vockey",
   iam_instance_profile = LabRole, user_data = templatefile(...)
 
 Variáveis recebidas: public_subnet_id, ec2_security_group_id, ec2_instance_type,
 rds_address, rds_port, db_name, db_username (sensitive), db_password (sensitive),
 moodle_admin_password (sensitive), repo_url, repo_branch
-Outputs: ec2_public_dns, ec2_instance_id
+Outputs: public_dns, public_ip, ec2_instance_id
 
 ### R2.5 user_data.sh
 Executado no boot da EC2. Requisitos:
@@ -104,7 +105,11 @@ Executado no boot da EC2. Requisitos:
 
 ### R2.7 Restrições de segurança
 - db_password, db_username, moodle_admin_password: sensitive = true, sem default
-- ssh_allowed_cidr: default "0.0.0.0/0" com aviso na description
+- ssh_allowed_cidr: **sem default**; deve ser preenchido pelo aluno com seu IP público
+  no formato `x.x.x.x/32`. Adicionar `validation` em ambos os `variables.tf` (raiz e
+  módulo networking) que rejeita qualquer CIDR que não termine em `/32` e rejeita
+  explicitamente `0.0.0.0/0`. `terraform.tfvars.example` deve conter o placeholder
+  `SEU.IP.PUBLICO.AQUI/32`.
 - RDS: publicly_accessible = false
 - SG RDS: ingress 5432 via security_groups (não cidr_blocks)
 - Nenhum recurso aws_iam_*, aws_route53_*, aws_acm_*, aws_cloudfront_*
@@ -136,14 +141,25 @@ Pode ser diagrama ASCII detalhado ou imagem. Substituir o placeholder atual.
 
 ### R5.1 terraform-plan.yml
 Substituir o stub atual por um workflow funcional com:
-- trigger: workflow_dispatch
+- triggers: `workflow_dispatch` **e** `pull_request` (paths: `terraform/**`, `.github/workflows/terraform-plan.yml`)
+- permissions: `contents: read` e `pull-requests: write`
 - secrets AWS: AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY, AWS_SESSION_TOKEN
 - secrets Terraform (para evitar prompt interativo de variáveis):
-  TF_VAR_db_username, TF_VAR_db_password, TF_VAR_moodle_admin_password, TF_VAR_repo_url
-- steps: checkout, configure-aws-credentials@v4, setup-terraform@v3,
-  terraform init -backend=false, terraform plan
+  TF_VAR_db_username, TF_VAR_db_password, TF_VAR_moodle_admin_password,
+  TF_VAR_repo_url, TF_VAR_ssh_allowed_cidr
+- steps:
+  1. checkout
+  2. configure-aws-credentials@v4
+  3. setup-terraform@v3
+  4. `terraform init -backend=false`
+  5. `terraform validate -no-color`
+  6. `terraform plan -no-color` com `continue-on-error: true` e `id: plan` (captura output)
+  7. Em runs de `pull_request`: postar output do plan como comentário no PR via
+     `actions/github-script` (usar `github.rest.issues.createComment`, formatar em bloco
+     de código com estado do plan — saída cortada em 60000 caracteres)
+  8. Step final que falha (`exit 1`) se o plan falhou (checar `steps.plan.outcome`)
 - working-directory: terraform
-- Todo run: step com name: preenchido (exigido pelo test_workflow_step_comments.py)
+- Todo `run:` step com `name:` preenchido (exigido pelo test_workflow_step_comments.py)
 
 ### R5.2 terraform-validate.yml
 Remover a condição `if: ${{ hashFiles('terraform/versions.tf') != '' }}` do job,

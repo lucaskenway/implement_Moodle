@@ -30,7 +30,7 @@ Antes de começar, verifique se você tem as seguintes ferramentas instaladas e 
 │   └── workflows/                       # Pipelines de CI/CD (GitHub Actions)
 │       ├── docker-lint.yml              #   - Lint do Dockerfile (hadolint)
 │       ├── health-check.yml             #   - Health check manual (workflow_dispatch)
-│       ├── terraform-plan.yml           #   - Stub: terraform plan (a implementar)
+│       ├── terraform-plan.yml           #   - terraform plan em pull_request e workflow_dispatch; comenta o plan no PR
 │       └── terraform-validate.yml       #   - fmt-check + validate
 ├── docker/                              # Ambiente Docker local de referência (funcional)
 │   ├── .env.example                     #   - Variáveis de ambiente documentadas
@@ -130,13 +130,41 @@ O template **não** entrega os módulos Terraform funcionais — eles são sua t
 
 | Módulo | Recursos a provisionar |
 |---|---|
-| **`networking`** | VPC, 1 subnet pública + 2 subnets privadas (AZs distintas), Internet Gateway, route tables, Security Group do EC2 (portas 80 e 22) e Security Group do RDS (porta 5432 a partir do SG do EC2) |
-| **`compute`** | Instância EC2 `t3.medium` (Amazon Linux 2023), IAM instance profile `LabRole` via **data source** (não criar `aws_iam_role`), `aws_key_pair`, e `user_data.sh` injetado via `templatefile()` |
+| **`networking`** | VPC, 2 subnets públicas + 2 subnets privadas (AZs distintas), Internet Gateway, route tables, Security Group do EC2 (portas 80 e 22) e Security Group do RDS (porta 5432 a partir do SG do EC2) |
+| **`compute`** | Instância EC2 `t3.micro` (Amazon Linux 2023), IAM instance profile `LabRole` via **data source** (não criar `aws_iam_role`), `aws_key_pair`, e `user_data.sh` injetado via `templatefile()` |
 | **`database`** | `aws_db_subnet_group` (2 AZs privadas), `aws_db_instance` PostgreSQL 15 classe `db.t3.micro`, 20 GB, `publicly_accessible = false` |
+
+> **`ssh_allowed_cidr` é obrigatório:** preencha no `terraform.tfvars` com seu IP público no formato `x.x.x.x/32` — descubra com `curl https://checkip.amazonaws.com`.
 
 Restrições importantes do AWS Learn Lab: não use `aws_route53_*`, `aws_acm_*`, `aws_cloudfront_*` nem `aws_iam_user`. O DNS público do EC2 substitui o Route 53. Veja os detalhes em [`docs/aws-learn-lab-setup.md`](docs/aws-learn-lab-setup.md).
 
 Para a sequência completa de comandos (`init`, `plan`, `apply`, `destroy`) e exemplos de saída esperada, consulte o **[Guia do Terraform](docs/terraform-guide.md)**.
+
+
+
+## Deploy na AWS
+
+> Requer credenciais válidas do AWS Learner Lab em `~/.aws/credentials` e um `terraform/terraform.tfvars` preenchido (use `terraform.tfvars.example` como base).
+
+```bash
+# 1. Inicializar os providers e módulos
+terraform -chdir=terraform init
+
+# 2. Revisar o que será criado (sem custo)
+terraform -chdir=terraform plan
+
+# 3. Criar a infraestrutura (~2 min para EC2 + RDS)
+terraform -chdir=terraform apply
+
+# 4. Aguardar o boot da EC2 (~3–5 min) e pegar a URL
+terraform -chdir=terraform output ec2_public_dns   # DNS completo
+terraform -chdir=terraform output moodle_url       # http://<dns> pronto para colar no navegador
+
+# 5. Ao encerrar a sessão do Lab, destruir tudo para não consumir crédito
+terraform -chdir=terraform destroy
+```
+
+> As credenciais do Learner Lab expiram em ~4 h. Renove-as no portal AWS Academy antes de rodar `apply` ou `plan`. O estado (`terraform.tfstate`) fica local e nunca é commitado.
 
 
 
@@ -148,7 +176,7 @@ O repositório inclui pipelines de GitHub Actions em `.github/workflows/`:
 |---|---|---|
 | [`terraform-validate.yml`](.github/workflows/terraform-validate.yml) | `push` / `pull_request` em `main` | Executa `terraform fmt -check` e `terraform validate` (falha listando arquivos com problemas de formatação) |
 | [`docker-lint.yml`](.github/workflows/docker-lint.yml) | `push` / `pull_request` em `main` | Executa `hadolint` no `docker/Dockerfile` |
-| [`terraform-plan.yml`](.github/workflows/terraform-plan.yml) | `workflow_dispatch` | **Stub** com `# TODO:` — você implementa o `terraform plan` configurando os secrets `AWS_ACCESS_KEY_ID` e `AWS_SECRET_ACCESS_KEY` |
+| [`terraform-plan.yml`](.github/workflows/terraform-plan.yml) | `pull_request` (paths `terraform/**`) + `workflow_dispatch` | Executa `terraform validate` + `terraform plan`; posta o output do plan como comentário na PR; falha o job se o plan falhar |
 | [`health-check.yml`](.github/workflows/health-check.yml) | `workflow_dispatch` (input `moodle_url`) | Torna `health-check.sh` executável e o roda contra a URL informada |
 
 > Cada step dos workflows contém um comentário explicativo descrevendo o que a etapa faz.
@@ -184,6 +212,14 @@ pytest tests/ -v
 ```
 
 Os testes cobrem, entre outros: extensões PHP obrigatórias no Dockerfile, ausência de credenciais literais no `docker-compose.yml`, padrões do `.gitignore`, estrutura dos módulos Terraform, comentários `# TODO:` nos arquivos de configuração, comentários nos steps dos workflows, seções do template de arquitetura e o comportamento do `health-check.sh`.
+
+
+
+## Dificuldades encontradas
+
+- **Disco cheio no primeiro deploy:** o build da imagem Docker falhou com `no space left on device` porque o disco padrão da AMI tinha apenas 2 GB. Diagnóstico feito pelo `/var/log/user-data.log` via SSH; corrigido adicionando `root_block_device` com `volume_size = 20` e `volume_type = "gp3"` no `aws_instance.moodle` (evidência 005).
+
+- **SSH bloqueado após troca de sessão:** o IP público do aluno mudou entre sessões do Learner Lab e o acesso SSH foi recusado pelo Security Group — comportamento esperado do `/32`. Correção simples: atualizar `ssh_allowed_cidr` no `terraform.tfvars` com o novo IP e rodar `terraform apply` (apenas a regra do SG é modificada).
 
 
 

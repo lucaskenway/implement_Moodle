@@ -19,7 +19,8 @@ resource "aws_vpc" "main" {
 
 # -----------------------------------------------------------------------------
 # Subnets
-# 1 pública (EC2) + 2 privadas em AZs distintas (exigido pelo subnet group do RDS)
+# 2 públicas em AZs distintas (EC2 + reservada para uso futuro de Load Balancer)
+# 2 privadas em AZs distintas (exigido pelo subnet group do RDS)
 # -----------------------------------------------------------------------------
 resource "aws_subnet" "public_a" {
   vpc_id                  = aws_vpc.main.id
@@ -29,6 +30,17 @@ resource "aws_subnet" "public_a" {
 
   tags = {
     Name = "${var.project_name}-public-a"
+  }
+}
+
+resource "aws_subnet" "public_b" {
+  vpc_id                  = aws_vpc.main.id
+  cidr_block              = "10.0.4.0/24"
+  availability_zone       = "us-east-1b"
+  map_public_ip_on_launch = true
+
+  tags = {
+    Name = "${var.project_name}-public-b"
   }
 }
 
@@ -80,6 +92,11 @@ resource "aws_route_table" "public" {
 
 resource "aws_route_table_association" "public_a" {
   subnet_id      = aws_subnet.public_a.id
+  route_table_id = aws_route_table.public.id
+}
+
+resource "aws_route_table_association" "public_b" {
+  subnet_id      = aws_subnet.public_b.id
   route_table_id = aws_route_table.public.id
 }
 

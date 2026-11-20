@@ -13,9 +13,9 @@ aws_region = "us-east-1"
 # TODO: Ajuste o nome do projeto se necessário
 project_name = "moodle-challenge"
 
-# TODO: Restrinja ao seu IP público em produção (ex: "203.0.113.10/32")
-#       Use: curl -s https://checkip.amazonaws.com
-ssh_allowed_cidr = "0.0.0.0/0"
+# TODO: Restrinja ao seu IP público — descubra com: curl https://checkip.amazonaws.com
+#       Acrescente /32 no final (ex: se seu IP for 203.0.113.10, use "203.0.113.10/32")
+ssh_allowed_cidr = "SEU.IP.PUBLICO.AQUI/32"
 
 # TODO: Preencha com a URL HTTPS do seu fork do repositório
 repo_url = ""
