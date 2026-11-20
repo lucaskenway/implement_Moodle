@@ -22,7 +22,7 @@ variable "ec2_security_group_id" {
 variable "ec2_instance_type" {
   type        = string
   description = "Tipo da instância EC2."
-  default     = "t3.medium"
+  default     = "t3.micro"
 }
 
 variable "rds_address" {
