@@ -130,9 +130,11 @@ O template **não** entrega os módulos Terraform funcionais — eles são sua t
 
 | Módulo | Recursos a provisionar |
 |---|---|
-| **`networking`** | VPC, 1 subnet pública + 2 subnets privadas (AZs distintas), Internet Gateway, route tables, Security Group do EC2 (portas 80 e 22) e Security Group do RDS (porta 5432 a partir do SG do EC2) |
-| **`compute`** | Instância EC2 `t3.medium` (Amazon Linux 2023), IAM instance profile `LabRole` via **data source** (não criar `aws_iam_role`), `aws_key_pair`, e `user_data.sh` injetado via `templatefile()` |
+| **`networking`** | VPC, 2 subnets públicas + 2 subnets privadas (AZs distintas), Internet Gateway, route tables, Security Group do EC2 (portas 80 e 22) e Security Group do RDS (porta 5432 a partir do SG do EC2) |
+| **`compute`** | Instância EC2 `t3.micro` (Amazon Linux 2023), IAM instance profile `LabRole` via **data source** (não criar `aws_iam_role`), `aws_key_pair`, e `user_data.sh` injetado via `templatefile()` |
 | **`database`** | `aws_db_subnet_group` (2 AZs privadas), `aws_db_instance` PostgreSQL 15 classe `db.t3.micro`, 20 GB, `publicly_accessible = false` |
+
+> **`ssh_allowed_cidr` é obrigatório:** preencha no `terraform.tfvars` com seu IP público no formato `x.x.x.x/32` — descubra com `curl https://checkip.amazonaws.com`.
 
 Restrições importantes do AWS Learn Lab: não use `aws_route53_*`, `aws_acm_*`, `aws_cloudfront_*` nem `aws_iam_user`. O DNS público do EC2 substitui o Route 53. Veja os detalhes em [`docs/aws-learn-lab-setup.md`](docs/aws-learn-lab-setup.md).
 
