@@ -12,3 +12,20 @@ output "rds_port" {
   description = "Porta do endpoint RDS — use em MOODLE_DATABASE_PORT_NUMBER."
   value       = aws_db_instance.moodle.port
 }
+
+output "db_name" {
+  description = "Nome do banco de dados criado no RDS."
+  value       = aws_db_instance.moodle.db_name
+}
+
+output "db_username" {
+  description = "Usuário master do RDS."
+  value       = aws_db_instance.moodle.username
+  sensitive   = true
+}
+
+output "db_password" {
+  description = "Senha master do RDS."
+  value       = aws_db_instance.moodle.password
+  sensitive   = true
+}
