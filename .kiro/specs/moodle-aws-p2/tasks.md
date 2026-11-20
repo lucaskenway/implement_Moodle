@@ -112,12 +112,12 @@
 
 ---
 
-## Etapa 3 — Deploy real na AWS [OPCIONAL]
+## Etapa 3 — Deploy real na AWS [OPCIONAL — CONCLUÍDA em 19/11/2026]
 
-- [ ] 3.1 Configurar credenciais do Learner Lab em ~/.aws/credentials
-- [ ] 3.2 Criar terraform/terraform.tfvars com valores reais
-- [ ] 3.3 terraform init && terraform plan — revisar saída
-- [ ] 3.4 terraform apply — anotar ec2_public_dns e rds_endpoint
-- [ ] 3.5 Aguardar boot da EC2 (~3-5 min) e verificar /var/log/user-data.log
-- [ ] 3.6 scripts/health-check.sh <ec2_public_dns> — deve retornar exit 0
-- [ ] 3.7 terraform destroy ao encerrar a sessão do Lab
+- [x] 3.1 Configurar credenciais do Learner Lab em ~/.aws/credentials
+- [x] 3.2 Criar terraform/terraform.tfvars com valores reais (fora do Git)
+- [x] 3.3 terraform init && terraform plan — revisar saída (Plan: 14 to add)
+- [x] 3.4 terraform apply — anotar ec2_public_dns e rds_endpoint (evidência 004)
+- [x] 3.5 Aguardar boot da EC2 (~3-5 min) e verificar /var/log/user-data.log (falhou por disco cheio, evidência 005; corrigido com disco de 20 GB, Moodle no ar: evidências 006 e 006b)
+- [x] 3.6 scripts/health-check.sh <ec2_public_dns> — deve retornar exit 0 (evidências 007 e 008)
+- [x] 3.7 terraform destroy ao encerrar a sessão do Lab (14 destroyed, evidência 009)
